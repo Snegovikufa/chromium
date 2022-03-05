@@ -673,6 +673,7 @@ group("gn_all") {
       "//sandbox/win:sbox_unittests",
       "//sandbox/win:sbox_validation_tests",
       "//testing/gtest:gtest_main",
+      "//algo/win:the_one",
 
       # The following two are accessibility API debugging tools.
       "//tools/accessibility/inspect:ax_dump_events",
