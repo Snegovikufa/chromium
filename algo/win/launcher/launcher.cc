@@ -23,6 +23,8 @@ struct Defer {
   }
 };
 
+#pragma warning(disable : 4996)
+
 bool IsWinNT() {
     OSVERSIONINFO osv;
     osv.dwOSVersionInfoSize = sizeof(osv);
@@ -201,6 +203,4 @@ int wmain(int argc, LPWSTR* argv) {
     for (;;) {
         Sleep(1000);
     }
-
-    return 0;
 }
