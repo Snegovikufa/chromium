@@ -665,7 +665,7 @@ class BASE_EXPORT LogMessage {
   // The file and line information passed in to the constructor.
   const char* const file_;
   const int line_;
-  const char* file_basename_;
+  [[maybe_unused]] const char* file_basename_;
 
   // This is useful since the LogMessage class uses a lot of Win32 calls
   // that will lose the value of GLE and the code that called the log function
