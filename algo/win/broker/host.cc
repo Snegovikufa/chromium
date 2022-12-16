@@ -77,10 +77,10 @@ const std::wstring get_value(const char* key, const absl::optional<base::Value>&
     }
 
     LOG(INFO) << key << " is " << rule << std::endl;
-    std::u16string output;
-    base::UTF8ToUTF16(rule.c_str(), rule.size(), &output);
-    assert(sizeof(wchar_t) == sizeof(char16_t));
-    return std::wstring(output.begin(), output.end());
+
+    std::wstring output;
+    base::UTF8ToWide(rule.c_str(), strlen(rule.c_str()), &output);
+    return output;
 }
 
 int run_broker_main(int argc, wchar_t** argv) {
@@ -105,8 +105,8 @@ int run_broker_main(int argc, wchar_t** argv) {
         LOG(INFO) << "wline size is " << wline.size() << std::endl;
 
         std::string output;
-        if (!base::UTF16ToUTF8(base::StringPiece16(wline.begin(), wline.end()), wline.size(), &output)) {
-            LOG(INFO) << "Couldn't convert UTF16 to UTF8" << std::endl;
+        if (!base::WideToUTF8(wline.c_str(), wcslen(wline.c_str()), &output)) {
+            LOG(INFO) << "Couldn't convert UTF16/Wide to UTF8" << std::endl;
             return -2;
         }
 
@@ -143,7 +143,9 @@ int run_broker_main(int argc, wchar_t** argv) {
             LOG(INFO) << "launching target with pid " << target_result->process_id << std::endl;
 
             base::DictionaryValue out_root;
-            out_root.SetString(TARGET_ID, base::StringPiece16(target.begin(), target.end()));
+            std::u16string u16output;
+            base::WideToUTF16(target.c_str(), wcslen(target.c_str()), &u16output);
+            out_root.SetString(TARGET_ID, u16output);
             out_root.SetInteger(PROCESS_ID, target_result->process_id);
             out_root.SetInteger(RESULT, result);
 
