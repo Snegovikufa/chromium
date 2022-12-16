@@ -41,14 +41,14 @@ ResultCode SetupProtectedMode(
     if (result != SBOX_ALL_OK)
       break;
 
-  //result = target_policy->AddAppContainerProfile(
-  //  package_name, true);
+    result = target_policy->GetConfig()->AddAppContainerProfile(
+      package_name, true);
 
-  //if (result == SBOX_ERROR_UNSUPPORTED)
-  //{
-  //  LOG(INFO) << L"AppContainer profile is not supported" << std::endl;
-  //  result = SBOX_ALL_OK;
-  //}
+    if (result == SBOX_ERROR_UNSUPPORTED)
+    {
+      LOG(INFO) << L"AppContainer profile is not supported" << std::endl;
+      result = SBOX_ALL_OK;
+    }
 
     if (result != SBOX_ALL_OK)
       break;
