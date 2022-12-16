@@ -5,16 +5,18 @@
 
 #include "algo/win/broker/algobroker.h"
 #include "base/logging.h"
+#include "sandbox/win/src/app_container_base.h"
+#include "sandbox/win/src/restricted_token_utils.h"
 #include "sandbox/win/src/sandbox.h"
 #include "sandbox/win/src/sandbox_factory.h"
-#include "sandbox/win/src/app_container_profile.h"
-#include "sandbox/win/src/app_container_profile_base.h"
-#include "sandbox/win/src/restricted_token_utils.h"
+#include "sandbox/win/src/sandbox_policy.h"
+#include "sandbox/win/src/security_level.h"
 
 using namespace sandbox;
 
 ResultCode SetupProtectedMode(
-  const scoped_refptr<TargetPolicy>& target_policy,
+  BrokerServices* broker,
+  const std::unique_ptr<TargetPolicy>& target_policy,
   const wchar_t* package_name) {
   ResultCode result;
 
@@ -24,20 +26,18 @@ ResultCode SetupProtectedMode(
   target_policy->SetStderrHandle(GetStdHandle(STD_ERROR_HANDLE));
 
   do {
-    result = target_policy->SetTokenLevel(
-      USER_RESTRICTED_SAME_ACCESS, USER_LOCKDOWN);
+    result = target_policy->GetConfig()->SetTokenLevel(
+      USER_RESTRICTED_SAME_ACCESS, TokenLevel::USER_LOCKDOWN);
     if (result != SBOX_ALL_OK)
       break;
 
-    result = target_policy->SetDelayedIntegrityLevel(INTEGRITY_LEVEL_UNTRUSTED);
+    target_policy->GetConfig()->SetDelayedIntegrityLevel(INTEGRITY_LEVEL_UNTRUSTED);
+
+    result = broker->CreateAlternateDesktop(sandbox::Desktop::kAlternateWinstation);
     if (result != SBOX_ALL_OK)
       break;
 
-    result = target_policy->SetAlternateDesktop(true);
-    if (result != SBOX_ALL_OK)
-      break;
-
-    result = target_policy->SetJobLevel(JOB_LOCKDOWN, 0);
+    result = target_policy->GetConfig()->SetJobLevel(JobLevel::kLockdown, 0);
     if (result != SBOX_ALL_OK)
       break;
 
@@ -61,7 +61,7 @@ ResultCode SetupProtectedMode(
 ResultCode SpawnTarget(const wchar_t* path,
                        const wchar_t* arguments,
                        BrokerServices* broker_services,
-                       scoped_refptr<TargetPolicy> target_policy,
+                       std::unique_ptr<TargetPolicy>& target_policy,
                        PROCESS_INFORMATION* process_information) {
   LOG(INFO) << L"Target path: " << path << std::endl;
   LOG(INFO) << L"Target arguments: " << arguments << std::endl;
@@ -71,7 +71,7 @@ ResultCode SpawnTarget(const wchar_t* path,
 
   const ResultCode result = broker_services->SpawnTarget(path,
                                                          arguments,
-                                                         target_policy,
+                                                         std::move(target_policy),
                                                          &last_warning,
                                                          &last_error,
                                                          process_information);
@@ -108,7 +108,7 @@ std::vector<std::wstring> SplitString(const std::wstring& str, wchar_t ch) {
   return ret;
 }
 
-ResultCode SetupFileRules(scoped_refptr<TargetPolicy> target_policy,
+ResultCode SetupFileRules(std::unique_ptr<TargetPolicy>& target_policy,
                           const wchar_t* rules) {
   ResultCode result = SBOX_ALL_OK;
 
@@ -131,12 +131,12 @@ ResultCode SetupFileRules(scoped_refptr<TargetPolicy> target_policy,
     auto rule_path = rules_array[i];
     auto rule_sem = rules_array[i+1];
     if (rule_sem == L"RW") {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_FILES,
-                                      TargetPolicy::Semantics::FILES_ALLOW_ANY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kFiles,
+                                      sandbox::Semantics::kFilesAllowAny,
                                       rule_path.c_str());
     } else {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_FILES,
-                                      TargetPolicy::Semantics::FILES_ALLOW_READONLY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kFiles,
+                                      sandbox::Semantics::kFilesAllowReadonly,
                                       rule_path.c_str());
     }
 
@@ -149,7 +149,7 @@ ResultCode SetupFileRules(scoped_refptr<TargetPolicy> target_policy,
   return result;
 }
 
-ResultCode SetupRegistryRules(scoped_refptr<TargetPolicy> target_policy,
+ResultCode SetupRegistryRules(std::unique_ptr<TargetPolicy>& target_policy,
                           const wchar_t* rules) {
   ResultCode result = SBOX_ALL_OK;
 
@@ -172,12 +172,12 @@ ResultCode SetupRegistryRules(scoped_refptr<TargetPolicy> target_policy,
     auto rule_path = rules_array[i];
     auto rule_sem = rules_array[i+1];
     if (rule_sem == L"RW") {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_REGISTRY,
-                                      TargetPolicy::Semantics::REG_ALLOW_ANY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kREGISTRY,
+                                      sandbox::Semantics::REG_ALLOW_ANY,
                                       rule_path.c_str());
     } else {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_REGISTRY,
-                                      TargetPolicy::Semantics::REG_ALLOW_READONLY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kREGISTRY,
+                                      sandbox::Semantics::REG_ALLOW_READONLY,
                                       rule_path.c_str());
     }
 
@@ -190,7 +190,7 @@ ResultCode SetupRegistryRules(scoped_refptr<TargetPolicy> target_policy,
   return result;
 }
 
-ResultCode SetupEventRules(scoped_refptr<TargetPolicy> target_policy,
+ResultCode SetupEventRules(std::unique_ptr<TargetPolicy>& target_policy,
                           const wchar_t* rules) {
   ResultCode result = SBOX_ALL_OK;
 
@@ -213,12 +213,12 @@ ResultCode SetupEventRules(scoped_refptr<TargetPolicy> target_policy,
     auto rule_path = rules_array[i];
     auto rule_sem = rules_array[i+1];
     if (rule_sem == L"RW") {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_SYNC,
-                                      TargetPolicy::Semantics::EVENTS_ALLOW_ANY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+                                      sandbox::Semantics::EVENTS_ALLOW_ANY,
                                       rule_path.c_str());
     } else {
-      result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_SYNC,
-                                      TargetPolicy::Semantics::EVENTS_ALLOW_READONLY,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+                                      sandbox::Semantics::EVENTS_ALLOW_READONLY,
                                       rule_path.c_str());
     }
 
@@ -231,7 +231,7 @@ ResultCode SetupEventRules(scoped_refptr<TargetPolicy> target_policy,
   return result;
 }
 
-ResultCode SetupNamedPipeRules(scoped_refptr<TargetPolicy> target_policy,
+ResultCode SetupNamedPipeRules(std::unique_ptr<TargetPolicy>& target_policy,
                                const wchar_t* rules) {
   ResultCode result = SBOX_ALL_OK;
 
@@ -245,8 +245,8 @@ ResultCode SetupNamedPipeRules(scoped_refptr<TargetPolicy> target_policy,
   std::vector<std::wstring> rules_array = SplitString(rules_string, L'|');
 
   for (std::wstring rule : rules_array) {
-    result = target_policy->AddRule(TargetPolicy::SubSystem::SUBSYS_NAMED_PIPES,
-                                    TargetPolicy::Semantics::NAMEDPIPES_ALLOW_ANY,
+    result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kNamedPipes,
+                                    sandbox::Semantics::kNamedPipesAllowAny,
                                     rule.c_str());
     if (result != SBOX_ALL_OK)
       break;
@@ -283,10 +283,9 @@ int Spawn(const algo::TargetOptions* options,
       break;
     }
 
-    scoped_refptr<TargetPolicy> target_policy
-        = broker_services->CreatePolicy();
+    std::unique_ptr<TargetPolicy> target_policy = broker_services->CreatePolicy();
 
-    result_code = SetupProtectedMode(target_policy, options->package_name);
+    result_code = SetupProtectedMode(broker_services, target_policy, options->package_name);
     if (result_code != SBOX_ALL_OK) {
       break;
     }
