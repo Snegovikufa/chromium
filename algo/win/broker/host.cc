@@ -13,6 +13,7 @@
 #include "base/json/json_writer.h"
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
+#include "base/strings/string_piece.h"
 #include "base/values.h"
 
 #define TARGET_ID "targetId"
@@ -42,7 +43,7 @@ int _tmain(int argc, wchar_t* argv[]) {
     }
 }
 
-const std::wstring get_value(const char* key, const base::Optional<base::Value>& node) {
+const std::wstring get_value(const char* key, const absl::optional<base::Value>& node) {
     const std::string* const value = node->FindStringKey(key);
     std::string rule;
 
@@ -57,7 +58,7 @@ const std::wstring get_value(const char* key, const base::Optional<base::Value>&
                 rule += PIPE;
             }
             if (entry.is_dict()) {
-                base::Optional<bool> ro = entry.FindBoolKey(RO);
+                absl::optional<bool> ro = entry.FindBoolKey(RO);
                 const std::string* const pattern = entry.FindStringKey(PATTERN);
                 assert(pattern);
                 rule += *pattern;
@@ -76,9 +77,10 @@ const std::wstring get_value(const char* key, const base::Optional<base::Value>&
     }
 
     LOG(INFO) << key << " is " << rule << std::endl;
-    std::wstring output;
+    std::u16string output;
     base::UTF8ToUTF16(rule.c_str(), rule.size(), &output);
-    return output;
+    assert(sizeof(wchar_t) == sizeof(char16_t));
+    return std::wstring(output.begin(), output.end());
 }
 
 int run_broker_main(int argc, wchar_t** argv) {
@@ -103,14 +105,14 @@ int run_broker_main(int argc, wchar_t** argv) {
         LOG(INFO) << "wline size is " << wline.size() << std::endl;
 
         std::string output;
-        if (!base::UTF16ToUTF8(wline.c_str(), wline.size(), &output)) {
+        if (!base::UTF16ToUTF8(base::StringPiece16(wline.begin(), wline.end()), wline.size(), &output)) {
             LOG(INFO) << "Couldn't convert UTF16 to UTF8" << std::endl;
             return -2;
         }
 
         const auto& narrow_line = output;
-        base::Optional<base::Value> root = base::JSONReader::Read(narrow_line);
-        if (!root || root == base::nullopt) {
+        absl::optional<base::Value> root = base::JSONReader::Read(narrow_line);
+        if (!root || root == absl::nullopt) {
             LOG(INFO) << "Bad JSON: " << narrow_line << std::endl;
             continue;
         }
@@ -141,7 +143,7 @@ int run_broker_main(int argc, wchar_t** argv) {
             LOG(INFO) << "launching target with pid " << target_result->process_id << std::endl;
 
             base::DictionaryValue out_root;
-            out_root.SetString(TARGET_ID, target);
+            out_root.SetString(TARGET_ID, base::StringPiece16(target.begin(), target.end()));
             out_root.SetInteger(PROCESS_ID, target_result->process_id);
             out_root.SetInteger(RESULT, result);
 

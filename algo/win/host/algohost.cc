@@ -145,9 +145,11 @@ namespace
         osInfo.dwOSVersionInfoSize = sizeof(osInfo);
         RtlGetVersion(&osInfo);
         ret = (double)osInfo.dwMajorVersion;
+	return ret >= 10;
       }
-
-      return osInfo.dwMajorVersion >= 10;
+      else {
+          return false;
+      }
     }
 
     int start_with_preload(load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer_fn,
