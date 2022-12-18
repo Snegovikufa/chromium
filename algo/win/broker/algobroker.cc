@@ -5,6 +5,7 @@
 
 #include "algo/win/broker/algobroker.h"
 #include "base/logging.h"
+#include "sandbox/policy/win/sandbox_win.h"
 #include "sandbox/win/src/app_container_base.h"
 #include "sandbox/win/src/restricted_token_utils.h"
 #include "sandbox/win/src/sandbox.h"
@@ -25,23 +26,50 @@ ResultCode SetupProtectedMode(
   target_policy->SetStdoutHandle(GetStdHandle(STD_OUTPUT_HANDLE));
   target_policy->SetStderrHandle(GetStdHandle(STD_ERROR_HANDLE));
 
+  auto* config = target_policy->GetConfig();
+
   do {
-    result = target_policy->GetConfig()->SetTokenLevel(
+    result = config->SetTokenLevel(
       USER_RESTRICTED_SAME_ACCESS, TokenLevel::USER_LOCKDOWN);
     if (result != SBOX_ALL_OK)
       break;
 
-    target_policy->GetConfig()->SetDelayedIntegrityLevel(INTEGRITY_LEVEL_UNTRUSTED);
+    config->SetDelayedIntegrityLevel(INTEGRITY_LEVEL_UNTRUSTED);
+
+    result = config->SetProcessMitigations(
+      sandbox::MITIGATION_DEP | sandbox::MITIGATION_DEP_NO_ATL_THUNK |
+      sandbox::MITIGATION_SEHOP | sandbox::MITIGATION_HEAP_TERMINATE |
+      sandbox::MITIGATION_BOTTOM_UP_ASLR |
+      sandbox::MITIGATION_HIGH_ENTROPY_ASLR |
+      sandbox::MITIGATION_WIN32K_DISABLE |
+      sandbox::MITIGATION_EXTENSION_POINT_DISABLE |
+      sandbox::MITIGATION_NONSYSTEM_FONT_DISABLE |
+      sandbox::MITIGATION_HARDEN_TOKEN_IL_POLICY |
+      sandbox::MITIGATION_IMAGE_LOAD_NO_REMOTE |
+      sandbox::MITIGATION_IMAGE_LOAD_NO_LOW_LABEL);
+
+    // RELOCATE_IMAGE and RELOCATE_IMAGE_REQUIRED could be in
+    // SetProcessMitigations above, but they need to be delayed in Debug builds.
+    // It's easier to just set them up as delayed for both Debug and Release
+    // builds.
+    result = config->SetDelayedProcessMitigations(
+      sandbox::MITIGATION_RELOCATE_IMAGE |
+      sandbox::MITIGATION_RELOCATE_IMAGE_REQUIRED |
+      sandbox::MITIGATION_STRICT_HANDLE_CHECKS |
+      sandbox::MITIGATION_DLL_SEARCH_ORDER);
+
+    if (result != SBOX_ALL_OK)
+      break;
 
     result = broker->CreateAlternateDesktop(sandbox::Desktop::kAlternateWinstation);
     if (result != SBOX_ALL_OK)
       break;
 
-    result = target_policy->GetConfig()->SetJobLevel(JobLevel::kLockdown, 0);
+    result = config->SetJobLevel(JobLevel::kLockdown, 0);
     if (result != SBOX_ALL_OK)
       break;
 
-    result = target_policy->GetConfig()->AddAppContainerProfile(
+    result = config->AddAppContainerProfile(
       package_name, true);
 
     if (result == SBOX_ERROR_UNSUPPORTED)
@@ -50,8 +78,11 @@ ResultCode SetupProtectedMode(
       result = SBOX_ALL_OK;
     }
 
+    result = config->AddRule(SubSystem::kWin32kLockdown, Semantics::kFakeGdiInit, nullptr);
     if (result != SBOX_ALL_OK)
       break;
+
+    config->SetLockdownDefaultDacl();
   }
   while (false);
 
