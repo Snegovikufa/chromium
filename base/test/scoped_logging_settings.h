@@ -51,7 +51,7 @@ class BASE_EXPORT ScopedLoggingSettings {
   const bool enable_thread_id_;
   const bool enable_timestamp_;
   const bool enable_tickcount_;
-  const char* const log_prefix_;
+  char* log_prefix_;
 
   const LogMessageHandlerFunction message_handler_;
 };
