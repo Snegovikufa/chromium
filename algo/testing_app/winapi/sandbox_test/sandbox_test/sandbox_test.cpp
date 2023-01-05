@@ -49,7 +49,7 @@ int main()
 
   getenv_s(&requiredSize, NULL, 0, "USERPROFILE");
   if (requiredSize == 0) {
-    printf("LIB doesn't exist!\n");
+    printf("USERPROFILE doesn't exist!\n");
     exit(1);
   }
 
