@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <wchar.h>
 #include <windows.h>
 
 #include <iostream>
@@ -42,8 +44,26 @@ int main()
     return -1;
   }
 
-  std::wstring file = L"C:\\sandbox_test.txt";
-  LPCWSTR lpsFile = L"C:\\sandbox_test.txt";
+  char* profile;
+  size_t requiredSize;
+
+  getenv_s(&requiredSize, NULL, 0, "USERPROFILE");
+  if (requiredSize == 0) {
+    printf("LIB doesn't exist!\n");
+    exit(1);
+  }
+
+  profile = (char*)malloc(requiredSize * sizeof(char));
+  if (!profile) {
+    printf("Failed to allocate memory!\n");
+    exit(1);
+  }
+
+  getenv_s(&requiredSize, profile, requiredSize, "USERPROFILE");
+  std::string profile_path = std::string(profile);
+  auto profile_wide = std::wstring(profile_path.begin(), profile_path.end());
+  std::wstring file = profile_wide + std::wstring(L"\\sandbox_test.txt");
+  LPCWSTR lpsFile = file.c_str();
   HANDLE hFile = CreateFile(
       lpsFile,
       GENERIC_WRITE,
