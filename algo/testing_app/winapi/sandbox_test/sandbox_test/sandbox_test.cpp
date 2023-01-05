@@ -5,6 +5,7 @@
 
 std::string GetLastErrorAsString() {
   DWORD errorMessageID = ::GetLastError();
+  std::cerr << "LastError is " << errorMessageID << std::endl;
   if (errorMessageID == 0) {
     return std::string();
   }
@@ -28,7 +29,7 @@ int main()
   DWORD dwDisposition;
   std::wstring key = L"sandbox_test";
   LPCWSTR lpsKey = key.c_str();
-  if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+  if (RegCreateKeyEx(HKEY_CURRENT_USER,
                      lpsKey, 0,
                      NULL, 0, KEY_WRITE, NULL, &hKey,
                      &dwDisposition) == ERROR_SUCCESS) {
