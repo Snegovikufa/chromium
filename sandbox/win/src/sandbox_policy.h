@@ -1,4 +1,4 @@
-// Copyright 2012 The Chromium Authors
+// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <string>
+
 #include "base/memory/scoped_refptr.h"
 #include "sandbox/win/src/sandbox_types.h"
 #include "sandbox/win/src/security_level.h"
@@ -15,6 +17,7 @@
 namespace sandbox {
 
 class AppContainer;
+class PolicyInfo;
 
 // Desktop used to launch child, controls GetDesktop().
 enum class Desktop {
@@ -210,6 +213,10 @@ class [[clang::lto_visibility_public]] TargetConfig {
   // resources.
   virtual void SetLockdownDefaultDacl() = 0;
 
+  // Adds a restricting random SID to the restricted SIDs list as well as
+  // the default DACL.
+  virtual void AddRestrictingRandomSid() = 0;
+
   // Configure policy to use an AppContainer profile. |package_name| is the
   // name of the profile to use. Specifying True for |create_profile| ensures
   // the profile exists, if set to False process creation will fail if the
@@ -220,6 +227,14 @@ class [[clang::lto_visibility_public]] TargetConfig {
 
   // Get the configured AppContainer.
   virtual scoped_refptr<AppContainer> GetAppContainer() = 0;
+
+  // Set effective token that will be used for creating the initial and
+  // lockdown tokens. The token the caller passes must remain valid for the
+  // lifetime of the policy object.
+  virtual void SetEffectiveToken(HANDLE token) = 0;
+
+  // Returns a snapshot of the policy configuration.
+  virtual std::unique_ptr<PolicyInfo> GetPolicyInfo() = 0;
 
   // Allows the launch of the the target process to proceed even if no job can
   // be created.
