@@ -22,7 +22,7 @@ class RegistryPolicy {
   // Creates the required low-level policy rules to evaluate a high-level
   // policy rule for registry IO, in particular open or create actions.
   static bool GenerateRules(const wchar_t* name,
-                            TargetPolicy::Semantics semantics,
+                            Semantics semantics,
                             LowLevelPolicy* policy);
 
   // Performs the desired policy action on a create request with an
