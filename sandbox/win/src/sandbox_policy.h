@@ -204,10 +204,6 @@ class [[clang::lto_visibility_public]] TargetConfig {
   // Returns the currently set delayed mitigation flags.
   virtual MitigationFlags GetDelayedProcessMitigations() const = 0;
 
-  // Adds a restricting random SID to the restricted SIDs list as well as
-  // the default DACL.
-  virtual void AddRestrictingRandomSid() = 0;
-
   // Locks down the default DACL of the created lockdown and initial tokens
   // to restrict what other processes are allowed to access a process' kernel
   // resources.
@@ -228,13 +224,13 @@ class [[clang::lto_visibility_public]] TargetConfig {
   // Get the configured AppContainer.
   virtual scoped_refptr<AppContainer> GetAppContainer() = 0;
 
-  // Set effective token that will be used for creating the initial and
-  // lockdown tokens. The token the caller passes must remain valid for the
-  // lifetime of the policy object.
-  virtual void SetEffectiveToken(HANDLE token) = 0;
+//// Set effective token that will be used for creating the initial and
+//// lockdown tokens. The token the caller passes must remain valid for the
+//// lifetime of the policy object.
+//virtual void SetEffectiveToken(HANDLE token) = 0;
 
-  // Returns a snapshot of the policy configuration.
-  virtual std::unique_ptr<PolicyInfo> GetPolicyInfo() = 0;
+//// Returns a snapshot of the policy configuration.
+//virtual std::unique_ptr<PolicyInfo> GetPolicyInfo() = 0;
 
   // Allows the launch of the the target process to proceed even if no job can
   // be created.
