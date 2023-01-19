@@ -123,6 +123,12 @@ NTSTATUS CopyNameAndAttributes(
     size_t* out_name_len,
     uint32_t* attributes = nullptr);
 
+NTSTATUS AllocAndCopyName(
+	const OBJECT_ATTRIBUTES* in_object,
+	std::unique_ptr<wchar_t, NtAllocDeleter>* out_name,
+	uint32_t* attributes,
+	HANDLE* root);
+
 // Initializes our ntdll level heap
 bool InitHeap();
 

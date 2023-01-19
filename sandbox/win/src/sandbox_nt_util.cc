@@ -288,6 +288,22 @@ NTSTATUS CopyData(void* destination, const void* source, size_t bytes) {
   return ret;
 }
 
+NTSTATUS AllocAndCopyName(
+    const OBJECT_ATTRIBUTES* in_object,
+    std::unique_ptr<wchar_t, NtAllocDeleter>* out_name,
+    uint32_t* attributes,
+    HANDLE* root) {
+  NTSTATUS ret = STATUS_UNSUCCESSFUL;
+
+  if (!root)
+    return ret;
+
+  size_t out_name_len,
+  ret = CopyNameAndAttributes(in_object, out_name, &out_name_len, attributes);
+  *root = in_object->RootDirectory;
+  return ret
+}
+
 NTSTATUS CopyNameAndAttributes(
     const OBJECT_ATTRIBUTES* in_object,
     std::unique_ptr<wchar_t, NtAllocDeleter>* out_name,
