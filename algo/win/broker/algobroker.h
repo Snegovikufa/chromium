@@ -14,7 +14,9 @@ struct TargetOptions {
   const wchar_t* command_line;
   const wchar_t* package_name;
   const wchar_t* fs_rules;
+  const wchar_t* reg_rules;
   const wchar_t* np_rules;
+  const wchar_t* ev_rules;
 };
 
 struct TargetInformation {

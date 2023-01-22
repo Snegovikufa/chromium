@@ -128,7 +128,9 @@ int run_broker_main(int argc, wchar_t** argv) {
             cmd.c_str(),                 // command_line
             package_name.c_str(),        // package_name
             fs_rules.c_str(),            // file rules
+            reg_rules.c_str(),           // reg_rules
             pipe_rules.c_str(),          // np_rules
+            event_rules.c_str(),         // ev_rules
         };
 
         int result = Spawn(options, target_result);
