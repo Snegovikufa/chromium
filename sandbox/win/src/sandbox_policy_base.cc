@@ -28,6 +28,7 @@
 #include "sandbox/win/src/process_mitigations.h"
 #include "sandbox/win/src/process_mitigations_win32k_policy.h"
 #include "sandbox/win/src/process_thread_policy.h"
+#include "sandbox/win/src/registry_policy.h"
 #include "sandbox/win/src/restricted_token_utils.h"
 #include "sandbox/win/src/sandbox_policy.h"
 #include "sandbox/win/src/sandbox_policy_diagnostic.h"
