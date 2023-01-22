@@ -124,10 +124,10 @@ NTSTATUS CopyNameAndAttributes(
     uint32_t* attributes = nullptr);
 
 NTSTATUS AllocAndCopyName(
-	const OBJECT_ATTRIBUTES* in_object,
-	std::unique_ptr<wchar_t, NtAllocDeleter>* out_name,
-	uint32_t* attributes,
-	HANDLE* root);
+    const OBJECT_ATTRIBUTES* in_object,
+    std::unique_ptr<wchar_t, NtAllocDeleter>* out_name,
+    uint32_t* attributes,
+    HANDLE* root);
 
 // Initializes our ntdll level heap
 bool InitHeap();
@@ -183,6 +183,11 @@ bool IsValidImageSection(HANDLE section,
 
 // Converts an ansi string to an UNICODE_STRING.
 UNICODE_STRING* AnsiToUnicode(const char* string);
+
+// Determine full path name from object root and path.
+NTSTATUS AllocAndGetFullPath(HANDLE root,
+                             const wchar_t* path,
+                             std::unique_ptr<wchar_t, NtAllocDeleter>* full_path);
 
 // Resolves a handle to an nt path. Returns true if the handle can be resolved.
 bool NtGetPathFromHandle(HANDLE handle,
