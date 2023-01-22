@@ -120,7 +120,7 @@ NTSTATUS NtOpenKeyInTarget(HANDLE* target_key_handle,
 namespace sandbox {
 
 bool RegistryPolicy::GenerateRules(const wchar_t* name,
-                                   TargetPolicy::Semantics semantics,
+                                   Semantics semantics,
                                    LowLevelPolicy* policy) {
   std::wstring resolved_name(name);
   if (resolved_name.empty()) {
@@ -138,7 +138,7 @@ bool RegistryPolicy::GenerateRules(const wchar_t* name,
   PolicyRule create(result);
 
   switch (semantics) {
-    case TargetPolicy::REG_ALLOW_READONLY: {
+    case Semantics::REG_ALLOW_READONLY: {
       // We consider all flags that are not known to be readonly as potentially
       // used for write. Here we also support MAXIMUM_ALLOWED, but we are going
       // to expand it to read-only before the call.
@@ -147,7 +147,7 @@ bool RegistryPolicy::GenerateRules(const wchar_t* name,
       create.AddNumberMatch(IF_NOT, OpenKey::ACCESS, restricted_flags, AND);
       break;
     }
-    case TargetPolicy::REG_ALLOW_ANY: {
+    case Semantics::REG_ALLOW_ANY: {
       break;
     }
     default: {

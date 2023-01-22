@@ -52,6 +52,8 @@ enum class Semantics {
                         // be used to allow the DLLs to load and initialize
                         // even if the process cannot access that subsystem.
   kSignedAllowLoad,     // Allows loading the module when CIG is enabled.
+  REG_ALLOW_READONLY,   // Allows readonly access to a registry key.
+  REG_ALLOW_ANY,        // Allows read and write access to a registry key.
 };
 
 // Policy configuration that can be shared over multiple targets of the same tag
