@@ -1,4 +1,4 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Copyright 2012 The Chromium Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -28,7 +28,6 @@
 #include "sandbox/win/src/process_mitigations.h"
 #include "sandbox/win/src/process_mitigations_win32k_policy.h"
 #include "sandbox/win/src/process_thread_policy.h"
-#include "sandbox/win/src/registry_policy.h"
 #include "sandbox/win/src/restricted_token_utils.h"
 #include "sandbox/win/src/sandbox_policy.h"
 #include "sandbox/win/src/sandbox_policy_diagnostic.h"
@@ -37,7 +36,6 @@
 #include "sandbox/win/src/signed_policy.h"
 #include "sandbox/win/src/target_process.h"
 #include "sandbox/win/src/top_level_dispatcher.h"
-#include "sandbox/win/src/window.h"
 
 namespace sandbox {
 namespace {
@@ -251,7 +249,6 @@ IntegrityLevel ConfigBase::GetIntegrityLevel() const {
 
 void ConfigBase::SetDelayedIntegrityLevel(IntegrityLevel integrity_level) {
   delayed_integrity_level_ = integrity_level;
-  return SBOX_ALL_OK;
 }
 
 ResultCode ConfigBase::SetLowBox(const wchar_t* sid) {
@@ -484,14 +481,6 @@ void PolicyBase::AddHandleToShare(HANDLE handle) {
   handles_to_share_.push_back(handle);
 }
 
-void PolicyBase::SetLockdownDefaultDacl() {
-  lockdown_default_dacl_ = true;
-}
-
-void PolicyBase::AddRestrictingRandomSid() {
-  add_restricting_random_sid_ = true;
-}
-
 const base::HandlesToInheritVector& PolicyBase::GetHandlesBeingShared() {
   return handles_to_share_;
 }
@@ -502,7 +491,6 @@ ResultCode PolicyBase::InitJob() {
 
   if (config()->GetJobLevel() == JobLevel::kNone)
     return SBOX_ALL_OK;
-  }
 
   // Create the Windows job object.
   DWORD result = job_.Init(config()->GetJobLevel(), nullptr,
@@ -510,7 +498,6 @@ ResultCode PolicyBase::InitJob() {
   if (ERROR_SUCCESS != result)
     return SBOX_ERROR_CANNOT_INIT_JOB;
 
-  *job = job_obj.Take();
   return SBOX_ALL_OK;
 }
 
@@ -649,19 +636,6 @@ bool PolicyBase::OnProcessFinished(DWORD process_id) {
   return true;
 }
 
-ResultCode PolicyBase::SetDisconnectCsrss() {
-// Does not work on 32-bit, and the ASAN runtime falls over with the
-// CreateThread EAT patch used when this is enabled.
-// See https://crbug.com/783296#c27.
-#if defined(_WIN64) && !defined(ADDRESS_SANITIZER)
-  if (base::win::GetVersion() >= base::win::Version::WIN10) {
-    is_csrss_connected_ = false;
-    return AddKernelObjectToClose(L"ALPC Port", nullptr);
-  }
-#endif  // !defined(_WIN64)
-  return SBOX_ALL_OK;
-}
-
 EvalResult PolicyBase::EvalPolicy(IpcTag service,
                                   CountedParameterSetBase* params) {
   PolicyGlobal* policy = config()->policy();
@@ -697,52 +671,9 @@ HANDLE PolicyBase::GetStderrHandle() {
   return stderr_handle_;
 }
 
-ResultCode PolicyBase::AddAppContainerProfile(const wchar_t* package_name,
-                                              bool create_profile) {
-  if (base::win::GetVersion() < base::win::Version::WIN8)
-    return SBOX_ERROR_UNSUPPORTED;
-
-  DCHECK(package_name);
-  if (app_container_ || integrity_level_ != INTEGRITY_LEVEL_LAST) {
-    return SBOX_ERROR_BAD_PARAMS;
-  }
-
-  if (create_profile) {
-    app_container_ = AppContainerBase::CreateProfile(
-        package_name, L"Chrome Sandbox", L"Profile for Chrome Sandbox");
-  } else {
-    app_container_ = AppContainerBase::Open(package_name);
-  }
-  if (!app_container_)
-    return SBOX_ERROR_CREATE_APPCONTAINER;
-
-  // A bug exists in CreateProcess where enabling an AppContainer profile and
-  // passing a set of mitigation flags will generate ERROR_INVALID_PARAMETER.
-  // Apply best efforts here and convert set mitigations to delayed mitigations.
-  // This bug looks to have been fixed in Win10 RS5, so exit early if possible.
-  if (base::win::GetVersion() >= base::win::Version::WIN10_RS5)
-    return SBOX_ALL_OK;
-
-  delayed_mitigations_ =
-      mitigations_ & GetAllowedPostStartupProcessMitigations();
-  DCHECK(delayed_mitigations_ ==
-         (mitigations_ & ~(MITIGATION_SEHOP |
-                           MITIGATION_RESTRICT_INDIRECT_BRANCH_PREDICTION)));
-  mitigations_ = 0;
-  return SBOX_ALL_OK;
-}
-
-scoped_refptr<AppContainer> PolicyBase::GetAppContainer() {
-  return GetAppContainerBase();
-}
-
 void PolicyBase::SetEffectiveToken(HANDLE token) {
   CHECK(token);
   effective_token_ = token;
-}
-
-scoped_refptr<AppContainerBase> PolicyBase::GetAppContainerBase() {
-  return app_container_;
 }
 
 ResultCode PolicyBase::SetupAllInterceptions(TargetProcess& target) {
