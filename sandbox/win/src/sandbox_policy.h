@@ -39,6 +39,7 @@ enum class SubSystem {
   kProcess,         // Creation of child processes.
   kWin32kLockdown,  // Win32K Lockdown related policy.
   kSignedBinary,    // Signed binary policy.
+  kREGISTRY,
 };
 
 // Allowable semantics when a rule is matched.
@@ -54,6 +55,8 @@ enum class Semantics {
   kSignedAllowLoad,     // Allows loading the module when CIG is enabled.
   REG_ALLOW_READONLY,   // Allows readonly access to a registry key.
   REG_ALLOW_ANY,        // Allows read and write access to a registry key.
+  EVENTS_ALLOW_ANY,
+  EVENTS_ALLOW_READONLY,
 };
 
 // Policy configuration that can be shared over multiple targets of the same tag

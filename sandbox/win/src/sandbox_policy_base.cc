@@ -192,6 +192,13 @@ ResultCode ConfigBase::AddRuleInternal(SubSystem subsystem,
       }
       break;
     }
+    case SubSystem::kREGISTRY: {
+      if (!RegistryPolicy::GenerateRules(pattern, semantics, policy_maker_.get())) {
+        NOTREACHED();
+        return SBOX_ERROR_BAD_PARAMS;
+      }
+      break;
+    }
     case SubSystem::kWin32kLockdown: {
       // Win32k intercept rules only supported on Windows 8 and above. This must
       // match the version checks in process_mitigations.cc for consistency.
