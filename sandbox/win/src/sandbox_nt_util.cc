@@ -301,7 +301,7 @@ NTSTATUS AllocAndCopyName(
   size_t out_name_len,
   ret = CopyNameAndAttributes(in_object, out_name, &out_name_len, attributes);
   *root = in_object->RootDirectory;
-  return ret
+  return ret;
 }
 
 NTSTATUS CopyNameAndAttributes(
