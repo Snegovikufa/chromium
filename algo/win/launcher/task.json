@@ -8,8 +8,12 @@
       "readOnly": true
     },
     {
-      "pattern": "\\??\\C:\\Program Files (x86)\\dotnet\\host\\fxr\\6.0.1\\hostfxr.dll",
+      "pattern": "\\??\\C:\\Program Files (x86)\\dotnet\\host\\fxr\\6.0.13\\hostfxr.dll",
       "readOnly": true
+    },
+    {
+      "pattern": "\\??\\C:\\Users\alex\sandbox_test.txt",
+      "readOnly": false
     }
   ],
   "pipeRules": [
@@ -33,6 +37,10 @@
     },
     {
       "pattern": "HKEY_CURRENT_USER\\*",
+      "readOnly": false
+    },
+    {
+      "pattern": "HKEY_CURRENT_USER\\sandbox_test",
       "readOnly": false
     }
   ]
