@@ -25,22 +25,24 @@ std::string GetLastErrorAsString() {
   return message;
 }
 
-int main()
+int run()
 {
   HKEY hKey;
   DWORD dwDisposition;
   std::wstring key = L"sandbox_test";
   LPCWSTR lpsKey = key.c_str();
-  if (RegCreateKeyEx(HKEY_CURRENT_USER,
-                     lpsKey, 0,
-                     NULL, 0, KEY_WRITE, NULL, &hKey,
-                     &dwDisposition) == ERROR_SUCCESS) {
-    std::wcout << L"Key " << key << L" has been written successfully" << std::endl;
+  LSTATUS res = RegCreateKeyEx(
+      HKEY_CURRENT_USER,
+      lpsKey, 0,
+      NULL, 0, KEY_WRITE, NULL, &hKey,
+      &dwDisposition);
+  if (res == ERROR_SUCCESS){
+    std::wcerr << L"Key " << key << L" has been written successfully" << std::endl;
     RegCloseKey(hKey);
   }
   else {
-    std::wcout << L"Create key " << key << L" has failed" << std::endl;
-    std::cerr << GetLastErrorAsString() << std::endl;
+    std::wcerr << L"Create key " << key << L" has failed" << std::endl;
+    std::cerr << "Return code is " << res << std::endl;
     return -1;
   }
 
@@ -73,12 +75,12 @@ int main()
       FILE_ATTRIBUTE_NORMAL,
       NULL);
   if (hFile == INVALID_HANDLE_VALUE) {
-    std::wcout << L"Failed to create file " << file << std::endl;
+    std::wcerr << L"Failed to create file " << file << std::endl;
     std::cerr << GetLastErrorAsString() << std::endl;
     return -2;
   }
   else {
-    std::wcout << L"File " << file << L" has been created successfully" << std::endl;
+    std::wcerr << L"File " << file << L" has been created successfully" << std::endl;
     CloseHandle(hFile);
   }
 
