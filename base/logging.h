@@ -240,7 +240,7 @@ enum class BASE_EXPORT LogFormat { LOG_FORMAT_CHROME, LOG_FORMAT_SYSLOG };
 struct BASE_EXPORT LoggingSettings {
   // Equivalent to logging destination enum, but allows for multiple
   // destinations.
-  uint32_t logging_dest = LOG_DEFAULT | LOG_TO_STDERR;
+  uint32_t logging_dest = LOG_DEFAULT;
 
   // The four settings below have an effect only when LOG_TO_FILE is
   // set in |logging_dest|.
