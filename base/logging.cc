@@ -227,7 +227,7 @@ const char* log_severity_name(int severity) {
 
 // Specifies the process' logging sink(s), represented as a combination of
 // LoggingDestination values joined by bitwise OR.
-uint32_t g_logging_destination = LOG_DEFAULT;
+uint32_t g_logging_destination = LOG_DEFAULT | LOG_TO_STDERR;
 
 #if BUILDFLAG(IS_CHROMEOS)
 // Specifies the format of log header for chrome os.
