@@ -36,6 +36,10 @@
       "readOnly": true
     },
     {
+      "pattern": "HKEY_CURRENT_USER",
+      "readOnly": false
+    },
+    {
       "pattern": "HKEY_CURRENT_USER\\*",
       "readOnly": false
     },
