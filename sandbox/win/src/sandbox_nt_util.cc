@@ -317,8 +317,6 @@ NTSTATUS CopyNameAndAttributes(
   NTSTATUS ret = STATUS_UNSUCCESSFUL;
   __try {
     do {
-      if (in_object->RootDirectory != nullptr)
-        break;
       if (!in_object->ObjectName)
         break;
       if (!in_object->ObjectName->Buffer)
