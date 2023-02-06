@@ -269,7 +269,10 @@ bool PolicyRule::AddStringMatch(RuleType rule_type,
         }
         [[fallthrough]];
       default:
-        fragment += *current_char;
+        auto next_char = current_char[1];
+        if (next_char != L'*') {
+          fragment += *current_char;
+        }
         last_char = kLastCharIsAlpha;
     }
     ++current_char;
