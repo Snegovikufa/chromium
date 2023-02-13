@@ -259,7 +259,12 @@ bool g_log_process_id = true;
 bool g_log_thread_id = true;
 bool g_log_timestamp = true;
 bool g_log_tickcount = false;
-char g_log_prefix[1 << 8] = "broker";
+
+#if BUILDFLAG(IS_WIN)
+  char g_log_prefix[1 << 8] = "broker";
+#else
+  char* g_log_prefix = nullptr;
+#endif
 
 // Should we pop up fatal debug messages in a dialog?
 bool show_error_dialogs = false;
@@ -646,6 +651,7 @@ void SetLogItems(bool enable_process_id, bool enable_thread_id,
   g_log_tickcount = enable_tickcount;
 }
 
+#if BUILDFLAG(IS_WIN)
 extern "C" {
   __declspec(dllexport) char g_target_id[1 << 8] = {};
 }
@@ -655,6 +661,11 @@ void SetLogPrefix(char* prefix) {
     strcpy(prefix, g_target_id);
   }
 }
+#else
+
+void SetLogPrefix(const char* prefix) {
+}
+#endif
 
 void SetShowErrorDialogs(bool enable_dialogs) {
   show_error_dialogs = enable_dialogs;
