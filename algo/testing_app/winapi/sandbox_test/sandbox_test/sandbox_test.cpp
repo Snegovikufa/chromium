@@ -84,5 +84,19 @@ int run()
     CloseHandle(hFile);
   }
 
+  LPCWSTR custom_log_name = L"SandboxLogTest";
+  HANDLE event_log = RegisterEventSource(NULL, custom_log_name);
+  LPCWSTR message = L"New event";
+
+  if (ReportEvent(event_log, EVENTLOG_SUCCESS, 0, 0, NULL, 1, 0, &message, NULL)) {
+    std::wcerr << L"Event \"" << message << L"\" has been reported successfully" << std::endl;
+    DeregisterEventSource(event_log);
+  }
+  else {
+    std::wcerr << L"Failed to report event " << message << std::endl;
+    std::cerr << GetLastErrorAsString() << std::endl;
+    return -3;
+  }
+
   return 0;
 }
