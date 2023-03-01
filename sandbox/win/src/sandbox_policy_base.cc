@@ -37,6 +37,7 @@
 #include "sandbox/win/src/signed_policy.h"
 #include "sandbox/win/src/target_process.h"
 #include "sandbox/win/src/top_level_dispatcher.h"
+#include "sandbox/win/src/window.h"
 
 namespace sandbox {
 namespace {
@@ -257,6 +258,7 @@ IntegrityLevel ConfigBase::GetIntegrityLevel() const {
 
 void ConfigBase::SetDelayedIntegrityLevel(IntegrityLevel integrity_level) {
   delayed_integrity_level_ = integrity_level;
+  return SBOX_ALL_OK;
 }
 
 ResultCode ConfigBase::SetLowBox(const wchar_t* sid) {
@@ -499,6 +501,7 @@ ResultCode PolicyBase::InitJob() {
 
   if (config()->GetJobLevel() == JobLevel::kNone)
     return SBOX_ALL_OK;
+  }
 
   // Create the Windows job object.
   DWORD result = job_.Init(config()->GetJobLevel(), nullptr,
@@ -506,6 +509,7 @@ ResultCode PolicyBase::InitJob() {
   if (ERROR_SUCCESS != result)
     return SBOX_ERROR_CANNOT_INIT_JOB;
 
+  *job = job_obj.Take();
   return SBOX_ALL_OK;
 }
 

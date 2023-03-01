@@ -52,6 +52,14 @@ const char kTag[] = "tag";
 const char kDisabled[] = "disabled";
 const char kEnabled[] = "enabled";
 
+base::Value ProcessIdList(std::vector<uint32_t> process_ids) {
+  base::Value results(base::Value::Type::LIST);
+  for (const auto pid : process_ids) {
+    results.Append(base::strict_cast<double>(pid));
+  }
+  return results;
+}
+
 std::string GetTokenLevelInEnglish(TokenLevel token) {
   switch (token) {
     case USER_LOCKDOWN:
@@ -62,6 +70,8 @@ std::string GetTokenLevelInEnglish(TokenLevel token) {
       return "Limited";
     case USER_INTERACTIVE:
       return "Interactive";
+    case USER_NON_ADMIN:
+      return "Non Admin";
     case USER_RESTRICTED_SAME_ACCESS:
       return "Restricted Same Access";
     case USER_UNPROTECTED:
@@ -172,6 +182,8 @@ std::string GetIpcTagAsString(IpcTag service) {
       return "NtOpenProcessToken";
     case IpcTag::NTOPENPROCESSTOKENEX:
       return "NtOpenProcessTokenEx";
+    case IpcTag::CREATEPROCESSW:
+      return "CreateProcessW";
     case IpcTag::NTCREATEKEY:
       return "NtCreateKey";
     case IpcTag::NTOPENKEY:
@@ -186,6 +198,8 @@ std::string GetIpcTagAsString(IpcTag service) {
       return "CreateThread";
     case IpcTag::NTCREATESECTION:
       return "NtCreateSection";
+    case IpcTag::WS2SOCKET:
+      return "WSA_Socket";
     case IpcTag::LAST:
       DCHECK(false) << "Unknown IpcTag";
       return "Unknown";

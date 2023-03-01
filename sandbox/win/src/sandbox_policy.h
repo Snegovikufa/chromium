@@ -40,6 +40,7 @@ enum class SubSystem {
   kWin32kLockdown,  // Win32K Lockdown related policy.
   kSignedBinary,    // Signed binary policy.
   kREGISTRY,
+  SUBSYS_SYNC,      // Creation of named sync objects.
 };
 
 // Allowable semantics when a rule is matched.
@@ -228,14 +229,6 @@ class [[clang::lto_visibility_public]] TargetConfig {
 
   // Get the configured AppContainer.
   virtual scoped_refptr<AppContainer> GetAppContainer() = 0;
-
-//// Set effective token that will be used for creating the initial and
-//// lockdown tokens. The token the caller passes must remain valid for the
-//// lifetime of the policy object.
-//virtual void SetEffectiveToken(HANDLE token) = 0;
-
-//// Returns a snapshot of the policy configuration.
-//virtual std::unique_ptr<PolicyInfo> GetPolicyInfo() = 0;
 
   // Allows the launch of the the target process to proceed even if no job can
   // be created.

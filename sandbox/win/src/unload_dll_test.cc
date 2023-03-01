@@ -1,4 +1,4 @@
-// Copyright 2012 The Chromium Authors
+// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -67,6 +67,35 @@ TEST(UnloadDllTest, MAYBE_BaselineAvicapDll) {
   runner = BaselineAvicapRunner();
   EXPECT_EQ(SBOX_TEST_SUCCEEDED, runner->RunTest(L"UseOneDLL B avicap32.dll"));
 }
+// Opens an event passed as the first parameter of argv.
+SBOX_TESTS_COMMAND int SimpleOpenEvent(int argc, wchar_t** argv) {
+  if (argc != 1)
+    return SBOX_TEST_FAILED_TO_EXECUTE_COMMAND;
+
+  base::win::ScopedHandle event_open(::OpenEvent(SYNCHRONIZE, false, argv[0]));
+  return event_open.Get() ? SBOX_TEST_SUCCEEDED : SBOX_TEST_FAILED;
+}
+
+// Fails on Windows ARM64: https://crbug.com/905526
+#if defined(ARCH_CPU_ARM64)
+#define MAYBE_BaselineAvicapDll DISABLED_BaselineAvicapDll
+#else
+#define MAYBE_BaselineAvicapDll BaselineAvicapDll
+#endif
+TEST(UnloadDllTest, MAYBE_BaselineAvicapDll) {
+  TestRunner runner;
+  runner.SetTestState(BEFORE_REVERT);
+  runner.SetTimeout(2000);
+  // Add a sync rule, because that ensures that the interception agent has
+  // more than one item in its internal table.
+  EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_SYNC,
+                             TargetPolicy::EVENTS_ALLOW_ANY, L"t0001"));
+
+  // Note for the puzzled: avicap32.dll is a 64-bit dll in 64-bit versions of
+  // windows so this test and the others just work.
+  EXPECT_EQ(SBOX_TEST_SUCCEEDED, runner.RunTest(L"UseOneDLL L avicap32.dll"));
+  EXPECT_EQ(SBOX_TEST_SUCCEEDED, runner.RunTest(L"UseOneDLL B avicap32.dll"));
+}
 
 std::unique_ptr<TestRunner> UnloadAvicapNoPatchingRunner() {
   auto runner = std::make_unique<TestRunner>();
@@ -91,12 +120,11 @@ std::unique_ptr<TestRunner> UnloadAvicapWithPatchingRunner() {
   // Add a couple of rules that ensures that the interception agent add EAT
   // patching on the client which makes sure that the unload dll record does
   // not interact badly with them.
-  runner->AddRule(SubSystem::kFiles, Semantics::kFilesAllowQuery,
-                  L"\\??\\*.exe");
-  runner->AddRule(SubSystem::kFiles, Semantics::kFilesAllowQuery,
-                  L"\\??\\*.log");
-  return runner;
-}
+  EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_REGISTRY,
+                             TargetPolicy::REG_ALLOW_ANY,
+                             L"HKEY_LOCAL_MACHINE\\Software\\Microsoft"));
+  EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_SYNC,
+                             TargetPolicy::EVENTS_ALLOW_ANY, L"tst0001"));
 
 TEST(UnloadDllTest, UnloadAviCapDllWithPatching) {
   auto runner = UnloadAvicapWithPatchingRunner();
