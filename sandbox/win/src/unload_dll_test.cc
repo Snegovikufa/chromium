@@ -121,6 +121,9 @@ std::unique_ptr<TestRunner> UnloadAvicapWithPatchingRunner() {
   // patching on the client which makes sure that the unload dll record does
   // not interact badly with them.
   EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_REGISTRY,
+                             TargetPolicy::REG_ALLOW_READONLY,
+                             L"HKEY_LOCAL_MACHINE"));
+  EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_REGISTRY,
                              TargetPolicy::REG_ALLOW_ANY,
                              L"HKEY_LOCAL_MACHINE\\Software\\Microsoft"));
   EXPECT_TRUE(runner.AddRule(TargetPolicy::SUBSYS_SYNC,
