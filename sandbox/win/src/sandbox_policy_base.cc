@@ -35,6 +35,7 @@
 #include "sandbox/win/src/sandbox_utils.h"
 #include "sandbox/win/src/security_capabilities.h"
 #include "sandbox/win/src/signed_policy.h"
+#include "sandbox/win/src/sync_policy.h"
 #include "sandbox/win/src/target_process.h"
 #include "sandbox/win/src/top_level_dispatcher.h"
 #include "sandbox/win/src/window.h"
@@ -200,6 +201,13 @@ ResultCode ConfigBase::AddRuleInternal(SubSystem subsystem,
       }
       break;
     }
+    case SubSystem::SUBSYS_SYNC: {
+      if (!SyncPolicy::GenerateRules(pattern, semantics, policy_maker_.get())) {
+        NOTREACHED();
+        return SBOX_ERROR_BAD_PARAMS;
+      }
+      break;
+    }
     case SubSystem::kWin32kLockdown: {
       // Win32k intercept rules only supported on Windows 8 and above. This must
       // match the version checks in process_mitigations.cc for consistency.
@@ -258,7 +266,6 @@ IntegrityLevel ConfigBase::GetIntegrityLevel() const {
 
 void ConfigBase::SetDelayedIntegrityLevel(IntegrityLevel integrity_level) {
   delayed_integrity_level_ = integrity_level;
-  return SBOX_ALL_OK;
 }
 
 ResultCode ConfigBase::SetLowBox(const wchar_t* sid) {
@@ -501,7 +508,6 @@ ResultCode PolicyBase::InitJob() {
 
   if (config()->GetJobLevel() == JobLevel::kNone)
     return SBOX_ALL_OK;
-  }
 
   // Create the Windows job object.
   DWORD result = job_.Init(config()->GetJobLevel(), nullptr,
@@ -509,7 +515,6 @@ ResultCode PolicyBase::InitJob() {
   if (ERROR_SUCCESS != result)
     return SBOX_ERROR_CANNOT_INIT_JOB;
 
-  *job = job_obj.Take();
   return SBOX_ALL_OK;
 }
 

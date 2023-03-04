@@ -25,7 +25,7 @@ class SyncPolicy {
   // open or create and policy is the policy generator to which the rules are
   // going to be added.
   static bool GenerateRules(const wchar_t* name,
-                            TargetPolicy::Semantics semantics,
+                            Semantics semantics,
                             LowLevelPolicy* policy);
 
   // Performs the desired policy action on a request.

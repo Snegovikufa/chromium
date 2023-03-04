@@ -125,15 +125,15 @@ NTSTATUS GetBaseNamedObjectsDirectory(HANDLE* directory) {
 }
 
 bool SyncPolicy::GenerateRules(const wchar_t* name,
-                               TargetPolicy::Semantics semantics,
+                               Semantics semantics,
                                LowLevelPolicy* policy) {
   std::wstring mod_name(name);
   if (mod_name.empty()) {
     return false;
   }
 
-  if (TargetPolicy::EVENTS_ALLOW_ANY != semantics &&
-      TargetPolicy::EVENTS_ALLOW_READONLY != semantics) {
+  if (Semantics::EVENTS_ALLOW_ANY != semantics &&
+      Semantics::EVENTS_ALLOW_READONLY != semantics) {
     // Other flags are not valid for sync policy yet.
     NOTREACHED();
     return false;
@@ -146,7 +146,7 @@ bool SyncPolicy::GenerateRules(const wchar_t* name,
   if (!open.AddStringMatch(IF, OpenEventParams::NAME, name, CASE_INSENSITIVE))
     return false;
 
-  if (TargetPolicy::EVENTS_ALLOW_READONLY == semantics) {
+  if (Semantics::EVENTS_ALLOW_READONLY == semantics) {
     // We consider all flags that are not known to be readonly as potentially
     // used for write.
     uint32_t allowed_flags = SYNCHRONIZE | GENERIC_READ | READ_CONTROL;
@@ -158,7 +158,7 @@ bool SyncPolicy::GenerateRules(const wchar_t* name,
     return false;
 
   // If it's not a read only, add the create rule.
-  if (TargetPolicy::EVENTS_ALLOW_READONLY != semantics) {
+  if (Semantics::EVENTS_ALLOW_READONLY != semantics) {
     PolicyRule create(result);
     if (!create.AddStringMatch(IF, NameBased::NAME, name, CASE_INSENSITIVE))
       return false;

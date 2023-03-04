@@ -52,14 +52,6 @@ const char kTag[] = "tag";
 const char kDisabled[] = "disabled";
 const char kEnabled[] = "enabled";
 
-base::Value ProcessIdList(std::vector<uint32_t> process_ids) {
-  base::Value results(base::Value::Type::LIST);
-  for (const auto pid : process_ids) {
-    results.Append(base::strict_cast<double>(pid));
-  }
-  return results;
-}
-
 std::string GetTokenLevelInEnglish(TokenLevel token) {
   switch (token) {
     case USER_LOCKDOWN:
@@ -70,8 +62,8 @@ std::string GetTokenLevelInEnglish(TokenLevel token) {
       return "Limited";
     case USER_INTERACTIVE:
       return "Interactive";
-    case USER_NON_ADMIN:
-      return "Non Admin";
+//  case USER_NON_ADMIN:
+//    return "Non Admin";
     case USER_RESTRICTED_SAME_ACCESS:
       return "Restricted Same Access";
     case USER_UNPROTECTED:
