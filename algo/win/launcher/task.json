@@ -13,6 +13,10 @@
     "\\\\.\\pipes\\some-pipe-name-2"
   ],
   "eventRules": [
+		{
+      "pattern": "New_event",
+      "readOnly": false
+    }
   ],
   "registryRules": [
     {
