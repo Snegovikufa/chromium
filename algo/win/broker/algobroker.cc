@@ -221,6 +221,47 @@ ResultCode SetupRegistryRules(std::unique_ptr<TargetPolicy>& target_policy,
   return result;
 }
 
+ResultCode SetupEventRules(std::unique_ptr<TargetPolicy>& target_policy,
+                          const wchar_t* rules) {
+  ResultCode result = SBOX_ALL_OK;
+
+  if (rules == nullptr)
+    return result;
+
+  std::wstring rules_string(rules);
+  if (rules_string.length() == 0)
+    return result;
+
+  std::vector<std::wstring> rules_array = SplitString(rules_string, L'|');
+
+  const auto rules_array_size = rules_array.size();
+  if (rules_array.size() % 2 != 0) {
+    LOG(INFO) << L"Event rules are not correct: " << rules_string.c_str() << std::endl;
+    return SBOX_ERROR_BAD_PARAMS;
+  }
+
+  for (size_t i = 0; i < rules_array_size; i += 2) {
+    auto rule_path = rules_array[i];
+    auto rule_sem = rules_array[i+1];
+    if (rule_sem == L"RW") {
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+                                      sandbox::Semantics::EVENTS_ALLOW_ANY,
+                                      rule_path.c_str());
+    } else {
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+                                      sandbox::Semantics::EVENTS_ALLOW_READONLY,
+                                      rule_path.c_str());
+    }
+
+    if (result != SBOX_ALL_OK)
+      break;
+
+    LOG(INFO) << L"Rule [Event] added: " << rule_path.c_str() << std::endl;
+  }
+
+  return result;
+}
+
 ResultCode SetupNamedPipeRules(std::unique_ptr<TargetPolicy>& target_policy,
                                const wchar_t* rules) {
   ResultCode result = SBOX_ALL_OK;
@@ -291,6 +332,11 @@ int Spawn(const algo::TargetOptions* options,
     }
 
     result_code = SetupNamedPipeRules(target_policy, options->np_rules);
+    if (result_code != SBOX_ALL_OK) {
+      break;
+    }
+
+    result_code = SetupEventRules(target_policy, options->ev_rules);
     if (result_code != SBOX_ALL_OK) {
       break;
     }
