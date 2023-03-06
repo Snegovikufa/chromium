@@ -244,11 +244,11 @@ ResultCode SetupEventRules(std::unique_ptr<TargetPolicy>& target_policy,
     auto rule_path = rules_array[i];
     auto rule_sem = rules_array[i+1];
     if (rule_sem == L"RW") {
-      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::SUBSYS_SYNC,
                                       sandbox::Semantics::EVENTS_ALLOW_ANY,
                                       rule_path.c_str());
     } else {
-      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::kSYNC,
+      result = target_policy->GetConfig()->AddRule(sandbox::SubSystem::SUBSYS_SYNC,
                                       sandbox::Semantics::EVENTS_ALLOW_READONLY,
                                       rule_path.c_str());
     }
