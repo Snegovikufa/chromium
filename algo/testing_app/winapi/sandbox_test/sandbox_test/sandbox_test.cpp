@@ -64,24 +64,56 @@ int run()
   getenv_s(&requiredSize, profile, requiredSize, "USERPROFILE");
   std::string profile_path = std::string(profile);
   auto profile_wide = std::wstring(profile_path.begin(), profile_path.end());
-  std::wstring file = profile_wide + std::wstring(L"\\sandbox_test.txt");
-  LPCWSTR lpsFile = file.c_str();
-  HANDLE hFile = CreateFile(
-      lpsFile,
-      GENERIC_WRITE,
-      FILE_SHARE_WRITE,
-      NULL,
-      CREATE_ALWAYS,
-      FILE_ATTRIBUTE_NORMAL,
-      NULL);
-  if (hFile == INVALID_HANDLE_VALUE) {
-    std::wcerr << L"Failed to create file " << file << std::endl;
+  std::wstring test_folder = profile_wide + std::wstring(L"\\sandbox_test");
+
+  if (!CreateDirectoryW(test_folder.c_str(), NULL) && ERROR_ALREADY_EXISTS != GetLastError())
+  {
+    std::wcerr << L"Failed to create the folder " << test_folder << std::endl;
     std::cerr << GetLastErrorAsString() << std::endl;
-    return -2;
+    return -4;
   }
-  else {
-    std::wcerr << L"File " << file << L" has been created successfully" << std::endl;
-    CloseHandle(hFile);
+
+  std::wstring file = test_folder + std::wstring(L"\\sandbox_test.txt");
+  std::wstring forbidden_file = profile_wide + std::wstring(L"\\forbidden");
+  LPCWSTR lpsFile = file.c_str();
+  LPCWSTR lpsForbiddenFile = forbidden_file.c_str();
+  {
+    HANDLE hFile = CreateFile(
+        lpsFile,
+        GENERIC_WRITE,
+        FILE_SHARE_WRITE,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    if (hFile == INVALID_HANDLE_VALUE) {
+      std::wcerr << L"Failed to create file " << file << std::endl;
+      std::cerr << GetLastErrorAsString() << std::endl;
+      return -2;
+    }
+    else {
+      std::wcerr << L"File " << file << L" has been created successfully" << std::endl;
+      CloseHandle(hFile);
+    }
+  }
+  {
+    HANDLE hFile = CreateFile(
+        lpsForbiddenFile,
+        GENERIC_WRITE,
+        FILE_SHARE_WRITE,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+    if (hFile == INVALID_HANDLE_VALUE) {
+      std::wcerr << L"Creation of file " << forbidden_file << 
+        " has been canceled by the broker in accordance with FS policy" << std::endl;
+      CloseHandle(hFile);
+    }
+    else {
+      std::wcerr << L"File " << file << L" has been created, but it shoudn't be!!!" << std::endl;
+      return -2;
+    }
   }
 
   LPCWSTR event_name = L"New_event";
