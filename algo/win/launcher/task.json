@@ -4,7 +4,7 @@
   "packageName": "test_env",
   "filesystemRules": [
     {
-      "pattern": "\\??\\C:\\Users\\alex\\sandbox_test.txt",
+      "pattern": "\\??\\C:\\Users\\alex\\sand*",
       "readOnly": false
     }
   ],
