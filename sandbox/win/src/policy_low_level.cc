@@ -270,7 +270,8 @@ bool PolicyRule::AddStringMatch(RuleType rule_type,
         [[fallthrough]];
       default:
         auto next_char = current_char[1];
-        if (next_char != L'*') {
+        auto skip = next_char == L'*' && *current_char == L'\\';
+        if (!skip) {
           fragment += *current_char;
         }
         last_char = kLastCharIsAlpha;
