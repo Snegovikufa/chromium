@@ -106,7 +106,7 @@ int run()
         FILE_ATTRIBUTE_NORMAL,
         NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
-      std::wcerr << L"Creation of file " << forbidden_file << 
+      std::wcerr << L"Creation of file " << forbidden_file <<
         " has been canceled by the broker in accordance with FS policy" << std::endl;
       CloseHandle(hFile);
     }
