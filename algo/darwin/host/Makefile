@@ -1,8 +1,11 @@
 CC = g++
-CFLAGS = -Wall
-LINKFLAGS = -framework Foundation 
 OBJECTS = main.o
 OUT = mac_algohost
+INC = -I../../native_host/inc
+LIB_INC = -L../../native_host/libs
+CFLAGS = -Wall $(INC)
+LIB = -lnethost
+LINKFLAGS = -framework Foundation $(LIB_INC) $(LIB)
 
 all: $(OUT)
 

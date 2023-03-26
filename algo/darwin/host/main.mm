@@ -2,7 +2,7 @@
 #include <nethost.h>
 #include <stdlib.h>
 
-#include "algo/native_host/nativehost.h"
+#include "nativehost.h"
 
 #define STR_EMPTY ""
 #define STR_DOT '.'
