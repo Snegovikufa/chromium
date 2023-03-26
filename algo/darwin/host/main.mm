@@ -2,17 +2,15 @@
 #include <nethost.h>
 #include <stdlib.h>
 
-#define STR_EMPTY L""
-#define STR_DOT L'.'
-#define PATH_DELIMITER L"\\"
+#include "algo/native_host/nativehost.h"
+
+#define STR_EMPTY ""
+#define STR_DOT '.'
+#define PATH_DELIMITER "\\"
 
 #define HOSTFXR_LIB L"hostfxr.dll"
 
-using string_t = std::basic_string<char_t>;
-
-
 int main(int argc, char** argv) {
-
     char host_fxr_path[PATH_MAX];
     size_t host_fxr_path_size = sizeof(host_fxr_path) / sizeof(char);
     int rc = get_hostfxr_path(host_fxr_path, &host_fxr_path_size, nullptr);
@@ -34,13 +32,13 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    const string_t product_path = getenv(CT_ENV_VAR_PRODUCT_PATH);
-    const string_t dotnet_path = getenv(CT_ENV_VAR_DOTNET_PATH);
-    const string_t hostfxr_path = getenv(CT_ENV_VAR_HOSTFXR_PATH);
+    const std::string product_path = std::string(getenv("__CT_PRODUCT_PATH"));
+    const std::string dotnet_path = std::string(getenv("__CT_DOTNET_PATH"));
+    const std::string hostfxr_path = std::string(getenv("__CT_HOSTFXR_PATH"));
 
-    const string_t endpoint_dir_path = product_path + PATH_DELIMITER + ENDPOINT_DIR;
-    const string_t endpoint_asm_path = endpoint_dir_path + PATH_DELIMITER + ENDPOINT_ASM;
-    const string_t endpoint_config_path = endpoint_dir_path + PATH_DELIMITER + ENDPOINT_CONFIG;
+    const std::string endpoint_dir_path = product_path + PATH_DELIMITER + ENDPOINT_DIR;
+    const std::string endpoint_asm_path = endpoint_dir_path + PATH_DELIMITER + ENDPOINT_ASM;
+    const std::string endpoint_config_path = endpoint_dir_path + PATH_DELIMITER + ENDPOINT_CONFIG;
 
     const char *config = "algo/testing_app/DotNetLib.runtimeconfig.json";
     const char *dotnet_path = "algo/testing_app/testing_app.dll";
