@@ -14,7 +14,7 @@
 #include <sys/mount.h>
 #include <sys/syscall.h>
 
-#include "algo/linux/host/native_host/nativehost.h"
+#include "algo/native_host/nativehost.h"
 #include "base/files/file_util.h"
 #include "sandbox/linux/services/credentials.h"
 #include "sandbox/linux/services/namespace_sandbox.h"
