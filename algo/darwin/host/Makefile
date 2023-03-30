@@ -1,7 +1,7 @@
 CC = g++
 OBJECTS = main.o
 OUT = mac_algohost
-INC = -I../../native_host/inc
+INC = -I../../native_host/inc -I../../native_host
 LIB_INC = -L../../native_host/libs
 CPPFLAGS = -Wall $(INC)
 LIB = -lnethost
