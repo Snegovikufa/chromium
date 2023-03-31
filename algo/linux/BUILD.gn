@@ -31,7 +31,7 @@ executable("host") {
   ]
 
   lib_dirs = [
-    "../native_host/libs"
+    "host/native_host/libs"
   ]
 
   libs = [
