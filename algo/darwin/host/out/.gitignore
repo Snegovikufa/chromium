@@ -1,0 +1,7 @@
+# This out dir is an empty dir reserved for build
+# files and executables
+
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
