@@ -1,2 +1,3 @@
 export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 export COMPlus_EnableDiagnostics=0
+export __CT_HOSTFXR_PATH=./libhostfxr.so
