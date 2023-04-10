@@ -32,7 +32,7 @@ namespace
     hostfxr_close_fn close_fptr;
 
     // Forward declarations
-    bool load_hostfxr();
+    bool load_hostfxr(const char*);
     load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char *assembly);
 }
 
@@ -40,14 +40,15 @@ component_entry_point_fn launch_dotnet(
     const char* dotnetlib_path,
     const char* dotnet_type,
     const char* dotnet_type_method,
-    const char* config)
+    const char* config,
+    const char* host_fxr_path)
 {
     //
     // STEP 1: Load HostFxr and get exported hosting functions
     //
-    if (!load_hostfxr())
+    if (!load_hostfxr(host_fxr_path))
     {
-        assert(false && "Failure: load_hostfxr()");
+        assert(false && "Failure: load_hostfxr");
         return nullptr;
     }
 
@@ -102,11 +103,11 @@ namespace
     }
 
     // Using the nethost library, discover the location of hostfxr and get exports
-    bool load_hostfxr()
+    bool load_hostfxr(const char* fxr_path)
     {
         // Load hostfxr and get desired exports
         // TODO: pass basename
-        void *lib = load_library("libhostfxr.so");
+        void *lib = load_library(fxr_path);
         init_fptr = (hostfxr_initialize_for_runtime_config_fn)get_export(lib, "hostfxr_initialize_for_runtime_config");
         get_delegate_fptr = (hostfxr_get_runtime_delegate_fn)get_export(lib, "hostfxr_get_runtime_delegate");
         close_fptr = (hostfxr_close_fn)get_export(lib, "hostfxr_close");
