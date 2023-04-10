@@ -57,7 +57,8 @@ int main(int argc, char** argv) {
     const char *dotnet_type_method = "ReverseLine";
 
     component_entry_point_fn entry_fn;
-    entry_fn = launch_dotnet(dotnet_asm_path, dotnet_type, dotnet_type_method, config, hostfxr_path);
+    entry_fn = launch_dotnet(dotnet_asm_path,
+            dotnet_type, dotnet_type_method, config, hostfxr_path.c_str());
 
     struct lib_args
     {
