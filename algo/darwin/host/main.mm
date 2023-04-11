@@ -13,14 +13,6 @@
 #define PATH_MAX 1024
 
 int main(int argc, char** argv) {
-//  char host_fxr_path[PATH_MAX];
-//  size_t host_fxr_path_size = sizeof(host_fxr_path) / sizeof(char);
-//  int rc = get_hostfxr_path(host_fxr_path, &host_fxr_path_size, nullptr);
-//  if (rc) {
-//      fprintf(stderr, "unable to get hostfxr path\n");
-//      return EXIT_FAILURE;
-//  }
-
     if (setenv("DOTNET_gcServer", "1", 1)) {
         return EXIT_FAILURE;
     }
@@ -48,12 +40,6 @@ int main(int argc, char** argv) {
     const auto endpoint_dir_path = product_path + PATH_DELIMITER + endpoint_dir;
     const auto endpoint_asm_path = endpoint_dir_path + PATH_DELIMITER + endpoint_asm;
     const auto endpoint_config_path = endpoint_dir_path + PATH_DELIMITER + endpoint_config;
-
-//  const auto dotnet_path = std::string(env_or_empty("__CT_DOTNET_PATH"));
-//  const char *config = "algo/testing_app/DotNetLib.runtimeconfig.json";
-//  const char *dotnet_asm_path = "algo/testing_app/testing_app.dll";
-//  const char *dotnet_type = "testing_app.Program, testing_app";
-//  const char *dotnet_type_method = "ReverseLine";
 
     const char *assembly = endpoint_asm_path.c_str();
     const char *type = endpoint_type.c_str();
