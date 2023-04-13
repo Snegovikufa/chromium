@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <assert.h>
+#include <dlfcn.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,14 +16,7 @@
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
 
-#include <dlfcn.h>
-//#include <limits.h>
-
-#define STR(s) s
-#define CH(c) c
 #define DIR_SEPARATOR '/'
-
-using string_t = std::basic_string<char>;
 
 namespace
 {
@@ -55,9 +49,8 @@ component_entry_point_fn launch_dotnet(
     //
     // STEP 2: Initialize and start the .NET Core runtime
     //
-    const string_t config_path = STR(config);
     load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer = nullptr;
-    load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
+    load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config);
     assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
 
     //
@@ -116,12 +109,12 @@ namespace
     }
 
     // Load and initialize .NET Core and get desired function pointer for scenario
-    load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char *config_path)
+    load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char *cfg)
     {
         // Load .NET Core
         void *load_assembly_and_get_function_pointer = nullptr;
         hostfxr_handle cxt = nullptr;
-        int rc = init_fptr(config_path, nullptr, &cxt);
+        int rc = init_fptr(cfg, nullptr, &cxt);
         if (rc != 0 || cxt == nullptr)
         {
             std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
