@@ -31,5 +31,4 @@ all: $(EXE) testing_app
 	cp -fv $(LD_PATH)/* $(BUILD_DIR)/
 
 clean: $(BUILD_DIR)
-	rm -rf $</*
-	rmdir $<
+	rm -rf $</
