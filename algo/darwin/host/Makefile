@@ -1,3 +1,4 @@
+.PHONY: all clean
 .DEFAULT_GOAL := all
 
 CXX = g++
@@ -11,6 +12,8 @@ LDFLAGS = -framework Foundation -L$(LD_PATH) $(LIBS) -Wl,-rpath,@loader_path
 SOURCES = main.mm ../../native_host/nativehost.cc
 OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/nativehost.o
 
+_ := $(shell mkdir $(BUILD_DIR))
+
 $(BUILD_DIR)/main.o: main.mm
 	$(CXX) $(CXXFLAGS) -c $^ -o $@
 
@@ -20,8 +23,13 @@ $(BUILD_DIR)/nativehost.o: ../../native_host/nativehost.cc
 $(EXE): $(OBJECTS)
 	$(CXX) $(LDFLAGS) $^ -o $(BUILD_DIR)/$@
 
-all: $(EXE)
+testing_app: ../../linux/testing_app/testing_app.csproj
+	$(info $(shell mkdir $(BUILD_DIR)/testing_app))
+	dotnet build ../../linux/testing_app/testing_app.csproj -o out/testing_app
+
+all: $(EXE) testing_app
 	cp -fv $(LD_PATH)/* $(BUILD_DIR)/
 
-clean:
-	rm -f $(BUILD_DIR)/*.o $(BUILD_DIR)/$(EXE)
+clean: $(BUILD_DIR)
+	rm -rf $</*
+	rmdir $<
