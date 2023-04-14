@@ -9,5 +9,5 @@ export __CT_HOSTFXR_PATH=/usr/local/share/dotnet/host/fxr/6.0.15/libhostfxr.dyli
 export __CT_ALGOHOST_ENDPOINT_DIR=testing_app
 export __CT_ALGOHOST_ENDPOINT_ASM=testing_app.dll
 export __CT_ALGOHOST_ENDPOINT_CONFIG=testing_app.runtimeconfig.json
-export __CT_ALGOHOST_ENDPOINT_TYPE=testing_app.Program, testing_app
+export __CT_ALGOHOST_ENDPOINT_TYPE='testing_app.Program, testing_app'
 export __CT_ALGOHOST_ENDPOINT_METHOD=ReverseLine
