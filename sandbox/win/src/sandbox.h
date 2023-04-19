@@ -121,10 +121,13 @@ class [[clang::lto_visibility_public]] BrokerServices {
   //   responsible for closing the handles returned in this structure.
   // Returns:
   //   ALL_OK if successful. All other return values imply failure.
-  virtual ResultCode SpawnTarget(
-      const wchar_t* exe_path, const wchar_t* command_line,
-      std::unique_ptr<TargetPolicy> policy, ResultCode* last_warning,
-      DWORD* last_error, PROCESS_INFORMATION* target) = 0;
+  virtual ResultCode SpawnTarget(const wchar_t* exe_path,
+                                 const wchar_t* command_line,
+                                 const wchar_t* current_directory,
+                                 std::unique_ptr<TargetPolicy> policy,
+                                 ResultCode* last_warning,
+                                 DWORD* last_error,
+                                 PROCESS_INFORMATION* target) = 0;
 
   // This call blocks (waits) for all the targets to terminate.
   // Returns:

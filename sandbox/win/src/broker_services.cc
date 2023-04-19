@@ -447,6 +447,7 @@ std::unique_ptr<TargetPolicy> BrokerServicesBase::CreatePolicy(
 // process inside the sandbox.
 ResultCode BrokerServicesBase::SpawnTarget(const wchar_t* exe_path,
                                            const wchar_t* command_line,
+                                           const wchar_t* current_directory,
                                            std::unique_ptr<TargetPolicy> policy,
                                            ResultCode* last_warning,
                                            DWORD* last_error,
@@ -569,7 +570,7 @@ ResultCode BrokerServicesBase::SpawnTarget(const wchar_t* exe_path,
       std::move(initial_token), std::move(lockdown_token),
       policy_base->GetJobHandle(), thread_pool_, imp_caps);
 
-  result = target->Create(exe_path, command_line, std::move(startup_info),
+  result = target->Create(exe_path, command_line, current_directory, std::move(startup_info),
                           &process_info, last_error);
 
   if (result != SBOX_ALL_OK) {
