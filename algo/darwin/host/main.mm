@@ -76,22 +76,23 @@ int main(int argc, char** argv) {
 
     const char profile[] = "(version 1)" \
                             "(deny default)" \
-                            "(allow file-read* (subpath (param \"USER_HOME_DIR\")))";
+                            "(allow file-read* (subpath \"/usr\"))" \
+                            "(allow file-read* (subpath (param \"CURRENT_DIR\")))" \
+                            "(allow file-write* (subpath (param \"EXE_DIR\")))";
 
-    const char* home_dir = [NSHomeDirectory() UTF8String];
-    const char* parameters[] = { "USER_HOME_DIR", home_dir, NULL };
+    const char *home_dir = [NSHomeDirectory() UTF8String];
+    const char *current_dir = [[[NSFileManager defaultManager] currentDirectoryPath] UTF8String];
+    const char *exe_dir = [[[NSBundle mainBundle] bundlePath] UTF8String];
+    const char *parameters[] = { "USER_HOME_DIR", home_dir,
+        "CURRENT_DIR", current_dir, "EXE_DIR", exe_dir, NULL };
 
     if (sandbox_init_with_parameters(profile, 0, parameters, NULL))
         exit(1);
 
-    const char* vim_rc = [[NSHomeDirectory() stringByAppendingString:@"/.vimrc"] UTF8String];
-    printf("vim_rc is %s\n", vim_rc);
-
-    struct stat sb;
-    if (stat(vim_rc, &sb) == 0)
-        printf(".vimrc file exists\n");
-    else
-        printf(".vimrc file does not exists\n");
+    NSString *test_file = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/test"];
+    NSString *content = @"Put this in a file please.";
+    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
+    [[NSFileManager defaultManager] createFileAtPath:test_file contents:fileContents attributes:nil];
 
     entry_fn(&args, sizeof(args));
 }
