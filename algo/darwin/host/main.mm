@@ -76,7 +76,10 @@ int main(int argc, char** argv) {
 
     const char profile[] = "(version 1)" \
                             "(deny default)" \
-                            "(allow file-read* (subpath \"/usr\"))" \
+                            "(allow file-read* (literal \"/usr\"))" \
+                            "(allow file-read* (literal \"/usr/local\"))" \
+                            "(allow file-read* (literal \"/usr/local/share\"))" \
+                            "(allow file-read* (subpath \"/usr/local/share/dotnet\"))" \
                             "(allow file-read* (subpath (param \"CURRENT_DIR\")))" \
                             "(allow file-write* (subpath (param \"EXE_DIR\")))";
 
