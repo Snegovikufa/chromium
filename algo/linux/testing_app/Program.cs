@@ -49,7 +49,7 @@ namespace testing_app
                 writable_stream2.Close();
                 return 0;
             }
-            Console.WriteLine("Now please open a new shell and run ./algo/linux/pipes_test.sh");
+            Console.WriteLine("Now please open a new shell and run pipes_test.sh");
             Console.WriteLine();
 
             Span<char> to_be_reversed = stackalloc char[2 << 12];

@@ -80,19 +80,37 @@ int main(int argc, char** argv) {
                             "(allow file-read* (subpath (param \"CURRENT_DIR\")))" \
                             "(allow file-write* (subpath (param \"EXE_DIR\")))";
 
+    NSString *exe_directory = [[NSBundle mainBundle] bundlePath];
+    const auto fs_manager = [NSFileManager defaultManager];
     const char *home_dir = [NSHomeDirectory() UTF8String];
-    const char *current_dir = [[[NSFileManager defaultManager] currentDirectoryPath] UTF8String];
-    const char *exe_dir = [[[NSBundle mainBundle] bundlePath] UTF8String];
+    const char *current_dir = [[fs_manager currentDirectoryPath] UTF8String];
+    const char *exe_dir = [exe_directory UTF8String];
     const char *parameters[] = { "USER_HOME_DIR", home_dir,
         "CURRENT_DIR", current_dir, "EXE_DIR", exe_dir, NULL };
 
     if (sandbox_init_with_parameters(profile, 0, parameters, NULL))
         exit(1);
 
-    NSString *test_file = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/test"];
+    NSString *test_file = [exe_directory stringByAppendingString:@"/test"];
     NSString *content = @"Put this in a file please.";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
-    [[NSFileManager defaultManager] createFileAtPath:test_file contents:fileContents attributes:nil];
+    [fs_manager createFileAtPath:test_file contents:fileContents attributes:nil];
+
+    [fs_manager changeCurrentDirectoryPath: exe_directory];
+    const auto *out_pipe = "out_pipe";
+    const auto *in_pipe = "in_pipe";
+    if (access(out_pipe, F_OK)) {
+        if (mkfifo(out_pipe, 0600) == -1) {
+            fprintf(stderr, "unable to create out_pipe");
+            return EXIT_FAILURE;
+        }
+    }
+    if (access(in_pipe, F_OK)) {
+        if (mkfifo(in_pipe, 0600) == -1) {
+            fprintf(stderr, "unable to create in_pipe");
+            return EXIT_FAILURE;
+        }
+    }
 
     entry_fn(&args, sizeof(args));
 }
