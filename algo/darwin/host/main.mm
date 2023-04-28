@@ -74,15 +74,6 @@ int main(int argc, char** argv) {
         .number = 1
     };
 
-    const char profile[] = "(version 1)" \
-                            "(deny default)" \
-                            "(allow file-read* (literal \"/usr\"))" \
-                            "(allow file-read* (literal \"/usr/local\"))" \
-                            "(allow file-read* (literal \"/usr/local/share\"))" \
-                            "(allow file-read* (subpath \"/usr/local/share/dotnet\"))" \
-                            "(allow file-read* (subpath (param \"CURRENT_DIR\")))" \
-                            "(allow file-write* (subpath (param \"EXE_DIR\")))";
-
     NSString *exe_directory = [[NSBundle mainBundle] bundlePath];
     const auto fs_manager = [NSFileManager defaultManager];
     const char *home_dir = [NSHomeDirectory() UTF8String];
@@ -91,6 +82,21 @@ int main(int argc, char** argv) {
     const char *parameters[] = { "USER_HOME_DIR", home_dir,
         "CURRENT_DIR", current_dir, "EXE_DIR", exe_dir, NULL };
 
+    NSError *error = nil;
+    NSString *policy_content = [NSString
+        stringWithContentsOfFile:@"./policy.sb"
+        encoding:NSUTF8StringEncoding
+        error:&error
+    ];
+
+    if (!policy_content) {
+        if (error)
+            NSLog(@"Error reading file: %@", error.localizedDescription);
+        return EXIT_FAILURE;
+    }
+    NSLog(@"policy is %@", policy_content);
+
+    const char *profile = [policy_content UTF8String];
     if (sandbox_init_with_parameters(profile, 0, parameters, NULL))
         exit(1);
 
