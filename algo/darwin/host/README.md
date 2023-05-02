@@ -29,8 +29,6 @@ $ find /usr/local/share/dotnet -name 'libhostfxr.dylib'
 Open env.sh in a text editor and set __CT_HOSTFXR_PATH to the path found
 Check if ENDPOINT vars belong to the dotnet assembly to be invoked by the host
 
-
-
 ### Environment variables in env.sh:
 
 |             Env var name             |             Value                     |            Description                |
@@ -42,7 +40,7 @@ Check if ENDPOINT vars belong to the dotnet assembly to be invoked by the host
 | __CT_ALGOHOST_ENDPOINT_DIR           | testing_app                           |   folder with dotnet assembly         |
 | __CT_ALGOHOST_ENDPOINT_ASM           | testing_app.dll                       |   name of assembly                    |
 | __CT_ALGOHOST_ENDPOINT_CONFIG        | testing_app.runtimeconfig.json        |   name of runtime config              |
-| __CT_ALGOHOST_ENDPOINT_TYPE          | 'testing_app.Program, testing_app'    |   class and namespace                 |
+| __CT_ALGOHOST_ENDPOINT_TYPE          | testing_app.Program, testing_app      |   class and namespace                 |
 | __CT_ALGOHOST_ENDPOINT_METHOD        | ReverseLine                           |   method to be invoked                |
 
 ### Source env.sh:
