@@ -5,7 +5,11 @@ CXX = g++
 BUILD_DIR = out
 EXE = mac_algohost
 INC = -I../../native_host/inc -I../../native_host
-ARCH = $(shell uname -m)
+
+ifndef ARCH
+  ARCH = $(shell uname -m)
+endif
+
 ifeq ($(ARCH), x86_64)
   LD_PATH = ./native_host/libs/x86_64
   $(info architecture is x64)
@@ -15,6 +19,7 @@ else ifeq ($(ARCH), aarch64)
 else
   $(error unsupported architecture)
 endif
+
 CXXFLAGS = -Wall -g3 -O0 --std=c++17 $(INC)
 LIBS = -lnethost
 LDFLAGS = -framework Foundation -L$(LD_PATH) $(LIBS) -Wl,-rpath,@loader_path
