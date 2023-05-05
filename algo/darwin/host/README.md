@@ -48,9 +48,19 @@ Check if ENDPOINT vars belong to the dotnet assembly to be invoked by the host
 $ source ./env.sh
 ```
 
-### Build the project:
+### Build the project for current host:
 ```shell
 $ make
+```
+
+### Build the project for ARM64 on x86_64:
+```shell
+$ ARCH=aarch64 make
+```
+
+### Build the project for x86_64 on ARM64:
+```shell
+$ ARCH=x86_64 make
 ```
 
 ### Run sandbox:
