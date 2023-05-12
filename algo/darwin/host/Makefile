@@ -35,10 +35,11 @@ $(BUILD_DIR)/nativehost.o: ../../native_host/nativehost.cc
 
 $(EXE): $(OBJECTS)
 	$(CXX) --target=$(TRIPLE) $(LDFLAGS) $^ -o $(BUILD_DIR)/$@
+	cp -fv ./policy.sb $(BUILD_DIR)
 
 testing_app: ../../linux/testing_app/testing_app.csproj
 	$(info $(shell mkdir -p $(BUILD_DIR)/testing_app))
-	dotnet build ../../linux/testing_app/testing_app.csproj -o out/testing_app
+	dotnet build ../../linux/testing_app/testing_app.csproj -o $(BUILD_DIR)/testing_app
 
 all: $(EXE) testing_app
 
