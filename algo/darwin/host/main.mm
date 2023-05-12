@@ -100,11 +100,6 @@ int main(int argc, char** argv) {
     if (sandbox_init_with_parameters(profile, 0, parameters, NULL))
         exit(1);
 
-    NSString *test_file = [exe_directory stringByAppendingString:@"/test"];
-    NSString *content = @"Put this in a file please.";
-    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
-    [fs_manager createFileAtPath:test_file contents:fileContents attributes:nil];
-
     [fs_manager changeCurrentDirectoryPath: exe_directory];
     const auto *out_pipe = "out_pipe";
     const auto *in_pipe = "in_pipe";
