@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 #include <iostream>
+#include <filesystem>
 #include <string>
 
 #include <errno.h>
@@ -57,7 +58,16 @@ int main(int argc, char** argv) {
     const char *fxr = hostfxr_path.c_str();
 
     if (!strlen(assembly) | !strlen(type) | !strlen(method) | !strlen(config) | !strlen(fxr)) {
-        std::cerr << "One of env vars are missing" << std::endl;
+        std::cerr << "At least one of env vars is missing" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    if (!std::filesystem::exists(assembly)) {
+        std::cerr << "Endpoint assembly path " << assembly << " does not exist"<< std::endl;
+        return EXIT_FAILURE;
+    }
+    if (!std::filesystem::exists(fxr)) {
+        std::cerr << "Hostfxr path " << fxr << " does not exist"<< std::endl;
         return EXIT_FAILURE;
     }
 
