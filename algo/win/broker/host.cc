@@ -119,7 +119,7 @@ int run_broker_main(int argc, wchar_t** argv) {
             continue;
         }
 
-        const auto title = get_value(TITLE, root);
+        const auto quoted_title = L"\"" + get_value(TITLE, root) + L"\"";
         const auto current_directory = get_value(CURRENT_DIRECTORY, root);
         const auto target = get_value(TARGET_ID, root);
         const auto args = get_value(ARGS, root);
@@ -128,14 +128,13 @@ int run_broker_main(int argc, wchar_t** argv) {
         const auto pipe_rules = get_value(PIPE_RULES, root);
         const auto event_rules = get_value(EVENT_RULES, root);
         const auto reg_rules = get_value(REG_RULES, root);
-        std::wstring quoted_title = L"\"" + title + L"\"";
         const auto cmd = quoted_title + WIDE_SPACE + target + WIDE_SPACE + args;
 
         algo::TargetInformation* target_result = new algo::TargetInformation;
         algo::TargetOptions* options = new algo::TargetOptions{
             exe,                         // host_path
             cmd.c_str(),                 // command_line
-            current_directory.c_str(),
+            current_directory.c_str(),   // current_dir
             package_name.c_str(),        // package_name
             fs_rules.c_str(),            // file rules
             reg_rules.c_str(),           // reg_rules
