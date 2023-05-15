@@ -177,7 +177,6 @@ int wmain(int argc, LPWSTR* argv) {
     assert(bytes_written > 0);
 
     std::replace(json_str.begin(), json_str.end(), 'B', 'F');
-    std::replace(json_str.begin(), json_str.end(), 'D', 'B');
     WriteFile(write_stdin, json_str.c_str(), json_str.size() * sizeof(wchar_t), &bytes_written, NULL);
     WriteFile(write_stdin, L"\r\n", 3, &bytes_read, NULL);
 
