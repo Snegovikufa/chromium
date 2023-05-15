@@ -1,4 +1,6 @@
 {
+  "title": "Sample Martingale cBot",
+  "currentDirectory": "C:\\Users\\alex\\lab\\chromium2\\src\\out",
   "targetId": "0B90B2ED-7DBA-4FD6-B17E-C47533300557",
   "args": "--some -additional=args -to /pass",
   "packageName": "test_env",
@@ -6,6 +8,10 @@
     {
       "pattern": "\\??\\C:\\Users\\alex\\sand*",
       "readOnly": false
+    },
+    {
+      "pattern": "\\??\\C:\\Users\\alex\\lab\\chromium2\\src\\out\\*",
+      "readOnly": true
     }
   ],
   "pipeRules": [
