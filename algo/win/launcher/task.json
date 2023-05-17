@@ -12,6 +12,22 @@
     {
       "pattern": "\\??\\C:\\Users\\alex\\lab\\chromium2\\src\\out\\*",
       "readOnly": true
+    },
+    {
+      "pattern": "\\??\\C:\\Users\\alex\\lab\\chromium2\\src\\out\\out.txt",
+      "readOnly": false
+    },
+    {
+      "pattern": "\\??\\C:\\Windows\\*",
+      "readOnly": true
+    },
+    {
+      "pattern": "\\??\\C:\\Program Files (x86)\\dotnet\\*",
+      "readOnly": true
+    },
+    {
+      "pattern": "\\??\\C:\\Program Files\\dotnet\\*",
+      "readOnly": true
     }
   ],
   "pipeRules": [
