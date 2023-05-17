@@ -37,7 +37,7 @@ namespace testing_app
             if (windows)
             {
                 var hello = "Hello world from dotnet on Windows!!!";
-                Console.WriteLine(hello);
+                Console.Error.WriteLine(hello);
 
                 var doc_folder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                 var out_path = Path.Combine(doc_folder, "out.txt");
