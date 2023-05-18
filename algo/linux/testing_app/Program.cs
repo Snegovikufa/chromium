@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Net.NetworkInformation;
 using System.IO;
-using System.IO.Pipes;
+using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -12,6 +12,8 @@ namespace testing_app
     {
         public static int DisplayNetworkConfiguration(IntPtr arg, int argLength)
         {
+            WriteCommandLineArgs(arg);
+
             NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
             foreach (NetworkInterface adapter in adapters)
             {
@@ -26,6 +28,8 @@ namespace testing_app
 
         public static int HelloWorldFromDotNetCore(IntPtr arg, int argLength)
         {
+            WriteCommandLineArgs(arg);
+
             Console.WriteLine("Hello World from .Net");
             Console.WriteLine();
             return 0;
@@ -33,6 +37,8 @@ namespace testing_app
 
         public static int ReverseLine(IntPtr arg, int argLength)
         {
+            WriteCommandLineArgs(arg);
+
             bool windows = System.OperatingSystem.IsWindows();
             if (windows)
             {
@@ -77,6 +83,13 @@ namespace testing_app
 
         static void Main(string[] args)
         {
+            var commandLineArgs = Environment.GetCommandLineArgs();
+
+            Console.WriteLine($"[Target process] Started with {commandLineArgs.Length} command line arguments:");
+
+            foreach (var arg in commandLineArgs)
+                Console.WriteLine($"\t\"{arg}\"");
+            
             Console.WriteLine("The display name is ");
             Console.WriteLine(typeof(Program).Assembly.FullName);
 
@@ -86,6 +99,23 @@ namespace testing_app
             DisplayNetworkConfiguration(IntPtr.Zero, 0);
 
             Thread.Sleep(3000);
+        }
+
+        private static void WriteCommandLineArgs(IntPtr ptr)
+        {
+            if (ptr != IntPtr.Zero)
+            {
+                Console.WriteLine("[Target process] 1. Started with command line arguments:");
+                var ansi = Marshal.PtrToStringAnsi(ptr);
+                Console.WriteLine(ansi);
+                return;
+            }
+
+            var commandLineArgs = Environment.GetCommandLineArgs();
+
+            Console.WriteLine($"[Target process] 2. Started with {commandLineArgs.Length} command line arguments:");
+
+            foreach (var arg in commandLineArgs) Console.WriteLine($"\t\"{arg}\"");
         }
     }
 }
