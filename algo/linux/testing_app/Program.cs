@@ -105,17 +105,17 @@ namespace testing_app
         {
             if (ptr != IntPtr.Zero)
             {
-                Console.WriteLine("[Target process] 1. Started with command line arguments:");
+                Console.Error.WriteLine("[Target process] 1. Started with command line arguments:");
                 var ansi = Marshal.PtrToStringAnsi(ptr);
-                Console.WriteLine(ansi);
+                Console.Error.WriteLine(ansi);
                 return;
             }
 
             var commandLineArgs = Environment.GetCommandLineArgs();
 
-            Console.WriteLine($"[Target process] 2. Started with {commandLineArgs.Length} command line arguments:");
+            Console.Error.WriteLine($"[Target process] 2. Started with {commandLineArgs.Length} command line arguments:");
 
-            foreach (var arg in commandLineArgs) Console.WriteLine($"\t\"{arg}\"");
+            foreach (var arg in commandLineArgs) Console.Error.WriteLine($"\t\"{arg}\"");
         }
     }
 }
