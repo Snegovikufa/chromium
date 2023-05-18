@@ -74,16 +74,6 @@ int main(int argc, char** argv) {
     component_entry_point_fn entry_fn;
     entry_fn = launch_dotnet(assembly, type, method, config, fxr);
 
-    struct lib_args {
-        const char *message;
-        int number;
-    };
-
-    lib_args args = {
-        .message = "from host!",
-        .number = 1
-    };
-
     NSString *exe_directory = [[NSBundle mainBundle] bundlePath];
     const auto fs_manager = [NSFileManager defaultManager];
     const char *home_dir = [NSHomeDirectory() UTF8String];
@@ -126,5 +116,10 @@ int main(int argc, char** argv) {
         }
     }
 
-    entry_fn(&args, sizeof(args));
+    std::string joinedArgs;
+    for (int i = 1; i < argc; i++) {
+        joinedArgs.append(argv[i]);
+        joinedArgs.append(" ");
+    }
+    entry_fn((void*) joinedArgs.c_str(), 1);
 }
