@@ -35,6 +35,9 @@ int main(int argc, char** argv) {
     if (setenv("DOTNET_Thread_UseAllCpuGroups", "1", 1)) {
         return EXIT_FAILURE;
     }
+    if (setenv("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "0", 1)) {
+        return EXIT_FAILURE;
+    }
 
     auto env_or_empty = [](const char* env) {return getenv(env) ? getenv(env) : "";};
 
@@ -79,25 +82,15 @@ int main(int argc, char** argv) {
     const char *home_dir = [NSHomeDirectory() UTF8String];
     const char *current_dir = [[fs_manager currentDirectoryPath] UTF8String];
     const char *exe_dir = [exe_directory UTF8String];
-    const char *parameters[] = { "USER_HOME_DIR", home_dir,
-        "CURRENT_DIR", current_dir, "EXE_DIR", exe_dir, NULL };
+    const char *parameters[] = { "USER_HOME_DIR", home_dir, "CURRENT_DIR", current_dir, "EXE_DIR", exe_dir, NULL };
 
-    NSError *error = nil;
-    NSString *policy_content = [NSString
-        stringWithContentsOfFile:@"./policy.sb"
-        encoding:NSUTF8StringEncoding
-        error:&error
-    ];
+    std::cerr << "Waiting policy:" << std::endl;
+    std::string policy_content;
+    std::getline(std::cin, policy_content);
 
-    if (!policy_content) {
-        if (error)
-            NSLog(@"Error reading file: %@", error.localizedDescription);
-        return EXIT_FAILURE;
-    }
-    NSLog(@"policy is %@", policy_content);
+    std::cerr << "policy is:" << policy_content << std::endl;
 
-    const char *profile = [policy_content UTF8String];
-    if (sandbox_init_with_parameters(profile, 0, parameters, NULL))
+    if (sandbox_init_with_parameters(policy_content.c_str(), 0, parameters, NULL))
         exit(1);
 
     [fs_manager changeCurrentDirectoryPath: exe_directory];
